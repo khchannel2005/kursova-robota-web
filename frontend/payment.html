@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Оплата</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fdfdfd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .payment-box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #FFD600;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      margin: 30px auto;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .checkmark {
+      display: none;
+      font-size: 50px;
+      color: green;
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .success-message {
+      font-size: 18px;
+      color: #222;
+      margin-top: 20px;
+    }
+
+    .back-btn {
+      margin-top: 30px;
+      background-color: #FFD600;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background-color: #e6c200;
+    }
+  </style>
+</head>
+<body>
+  <div class="payment-box">
+    <h2>Обробка платежу...</h2>
+    <div class="loader" id="loader"></div>
+    <div class="checkmark" id="checkmark">✔</div>
+    <div class="success-message" id="successMessage"></div>
+    <button class="back-btn" id="backBtn" style="display:none;" onclick="location.href='index.html'">Повернутися на головну</button>
+  </div>
+
+  <script>
+    // Емуляція оплати
+    const name = localStorage.getItem('name');
+    const address = localStorage.getItem('address');
+    const dish = localStorage.getItem('dish');
+
+    setTimeout(() => {
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('checkmark').style.display = 'block';
+      document.getElementById('successMessage').textContent =
+        `Оплата успішна! Замовлення "${dish}" буде доставлено за адресою: ${address}. Дякуємо, ${name}!`;
+      document.getElementById('backBtn').style.display = 'inline-block';
+
+      // Очищення даних
+      localStorage.removeItem('dish');
+      localStorage.removeItem('name');
+      localStorage.removeItem('address');
+    }, 2500); // 2.5 секунди для анімації
+  </script>
+</body>
+</html>

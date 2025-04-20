@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Увійти</title>
+  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <div class="form-container">
+    <h2>Увійти</h2>
+    <form id="loginForm">
+      <input type="text" id="username" class="input-field" placeholder="Логін" required />
+      <input type="password" id="password" class="input-field" placeholder="Пароль" required />
+      <button type="submit">Увійти</button>
+    </form>
+    <p>Ще не маєш акаунта? <a href="register.html">Зареєструватися</a></p>
+    <p><a href="forgot-password.html">Забули пароль?</a></p>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+  
+      // Перевірка на порожні поля
+      if (!username || !password) {
+        alert('Будь ласка, заповніть усі поля');
+        return;
+      }
+  
+      try {
+        const res = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+  
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          alert('Вхід успішний!');
+          window.location.href = 'index.html';
+        } else {
+          alert(data.message || 'Помилка входу');
+        }
+      } catch (error) {
+        alert('Сталася помилка при зв’язку з сервером. Спробуйте пізніше.');
+      }
+    });
+  </script>
+  
+</body>
+</html>

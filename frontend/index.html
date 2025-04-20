@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Замовлення їжі</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Шапка -->
+  <header class="header">
+    <div class="logo">FoodFast</div>
+    <div class="auth-buttons" id="authArea"></div>
+  </header>
+
+  <!-- Контент -->
+  <div class="container">
+    <h1>Меню</h1>
+    <div class="menu">
+      <div class="item" onclick="selectFood('Піца')">
+        <img src="/img/pizza.jpg" alt="Піца">
+        <p>Піца</p>
+      </div>
+      <div class="item" onclick="selectFood('Суші')">
+        <img src="/img/sushi.jpg" alt="Суші">
+        <p>Суші</p>
+      </div>
+      <div class="item" onclick="selectFood('Бургер')">
+        <img src="/img/burger.jpg" alt="Бургер">
+        <p>Бургер</p>
+      </div>
+    </div>
+
+    <h2>Оформлення замовлення</h2>
+    <form id="orderForm">
+      <input type="text" id="name" placeholder="Ваше ім’я" required />
+      <input type="text" id="address" placeholder="Адреса доставки" required />
+      <input type="text" id="food" placeholder="Обрана страва" required readonly />
+      <button type="submit">Замовити</button>
+    </form>
+    <p id="status"></p>
+  </div>
+<div style="text-align: center; margin-top: 30px;">
+  <a href="https://t.me/khchannel2005" target="_blank" class="btn-yellow">Зворотний зв’язок</a>
+</div>
+
+
+
+  <script>
+    // Функція для відображення кнопок входу/виходу
+    function renderAuthButtons() {
+      const authArea = document.getElementById('authArea');
+      const token = localStorage.getItem('token'); // Перевірка на наявність токену
+  
+      if (token) {
+        authArea.innerHTML = `
+          <a href="profile.html" class="btn-yellow">Мій профіль</a>
+          <button onclick="logout()" class="btn-yellow">Вийти</button>
+        `;
+      } else {
+        authArea.innerHTML = `
+          <a href="login.html" class="btn-yellow">Увійти</a>
+          <a href="register.html" class="btn-yellow">Реєстрація</a>
+        `;
+      }
+    }
+  
+    // Функція для виходу з акаунту
+    function logout() {
+      localStorage.removeItem('token'); // Видалення токену при виході
+      alert('Ви вийшли з акаунту');
+      renderAuthButtons(); // Оновлюємо кнопку входу/виходу
+      location.reload(); // Перезавантаження сторінки
+    }
+  
+    // Функція для вибору їжі (заповнення поля)
+    function selectFood(foodName) {
+      document.getElementById('food').value = foodName;
+    }
+  
+    // Виклик функції для відображення кнопок входу/виходу
+    renderAuthButtons();
+  
+    // Логіка обробки форми замовлення
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+  
+      const name = document.getElementById('name').value;
+      const address = document.getElementById('address').value;
+      const food = document.getElementById('food').value;
+  
+      let isValid = true;
+  
+      // Перевірка на порожні поля
+      if (!name || !address || !food) {
+        isValid = false;
+        document.getElementById('status').textContent = 'Будь ласка, заповніть усі поля';
+      } else if (name.length < 3) {
+        isValid = false;
+        document.getElementById('status').textContent = 'Ім’я має бути мінімум 3 символи';
+      } else if (address.length < 5) {
+        isValid = false;
+        document.getElementById('status').textContent = 'Адреса має бути мінімум 5 символів';
+      }
+  
+      // Якщо форма валідна, зберігаємо дані в localStorage і перенаправляємо на сторінку платежу
+      if (isValid) {
+        localStorage.setItem('name', name);
+        localStorage.setItem('address', address);
+        localStorage.setItem('dish', food);
+        window.location.href = 'payment.html';
+      }
+    });
+  </script>
+  
+</body>
+</html>

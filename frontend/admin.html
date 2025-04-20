@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Адмін панель</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px 15px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f0f0f0;
+      color: #444;
+    }
+
+    button {
+      background-color: #ffca28;
+      color: #333;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #ffc107;
+    }
+  </style>
+</head>
+<body>
+  <div id="homePage" class="page">
+    <h1>Головна сторінка</h1>
+    <button onclick="showOrdersPage()">Перейти до замовлень</button>
+  </div>
+
+  <div id="ordersPage" class="page" style="display: none;">
+    <h1>Усі замовлення</h1>
+    <!-- Тут буде таблиця з замовленнями -->
+    <button onclick="showHomePage()">Назад</button>
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Ім’я</th>
+          <th>Адреса</th>
+          <th>Страва</th>
+          <th>Статус</th>
+          <th>Оновити</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    function showHomePage() {
+      document.getElementById('homePage').style.display = 'block';
+      document.getElementById('ordersPage').style.display = 'none';
+    }
+
+    function showOrdersPage() {
+      document.getElementById('homePage').style.display = 'none';
+      document.getElementById('ordersPage').style.display = 'block';
+      loadOrders();  // Завантажити замовлення, коли перехід до цієї сторінки
+    }
+
+    async function loadOrders() {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:3000/orders', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) {
+        alert('Не вдалося завантажити замовлення');
+        return;
+      }
+
+      const orders = await res.json();
+      const tbody = document.querySelector('#ordersTable tbody');
+      tbody.innerHTML = '';
+
+      orders.forEach(order => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${order.name}</td>
+          <td>${order.address}</td>
+          <td>${order.food}</td>
+          <td>${order.status}</td>
+          <td><button onclick="updateStatus(${order.id})">Оновити</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function updateStatus(id) {
+      const token = localStorage.getItem('token');
+      const newStatus = prompt('Введіть новий статус для замовлення:');
+
+      if (!newStatus) return;
+
+      const res = await fetch(`http://localhost:3000/orders/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!res.ok) {
+        alert('Не вдалося оновити статус');
+        return;
+      }
+
+      alert('Статус оновлено');
+      loadOrders();  // Перезавантажуємо список замовлень
+    }
+
+    // Спочатку показуємо головну сторінку
+    showHomePage();
+  </script>
+</body>
+</html>

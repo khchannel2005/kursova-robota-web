@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Мій профіль</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">Мій сервіс</div>
+    <div class="auth-buttons" id="authButtons">
+      <!-- Кнопки для входу та реєстрації будуть тут -->
+    </div>
+  </header>
+  
+  <div class="container">
+    <h1>Мої замовлення</h1>
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Страва</th>
+          <th>Адреса</th>
+          <th>Статус</th>
+          <th>Час</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button id="logoutButton" class="btn-yellow">Вийти</button>
+    <button id="homeButton" class="btn-yellow">Повернутися на головну</button>
+  </div>
+
+  <script>
+    // Завантажуємо історію замовлень
+    async function loadHistory() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = 'login.html'; // Якщо немає токена, редірект на логін
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:3000/orders', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!res.ok) {
+          alert('Помилка при завантаженні замовлень');
+          return;
+        }
+
+        const orders = await res.json();
+        const tbody = document.querySelector('#historyTable tbody');
+        if (orders.length === 0) {
+          alert('У вас немає замовлень');
+          return;
+        }
+
+        orders.forEach(order => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${order.food}</td>
+            <td>${order.address}</td>
+            <td>${order.status}</td>
+            <td>${new Date(order.time).toLocaleString()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        alert('Сталася помилка при зв’язку з сервером. Спробуйте пізніше.');
+      }
+    }
+
+    // Завантажуємо таблицю замовлень при завантаженні сторінки
+    loadHistory();
+
+    // Обробка виходу
+    document.getElementById('logoutButton').addEventListener('click', function() {
+      localStorage.removeItem('token');
+      alert('Ви вийшли з акаунту');
+      window.location.href = 'login.html';
+    });
+
+    // Обробка кнопки "Повернутися на головну"
+    document.getElementById('homeButton').addEventListener('click', function() {
+      window.location.href = 'index.html';
+    });
+  </script>
+  
+</body>
+</html>
