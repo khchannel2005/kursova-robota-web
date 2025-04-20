@@ -3,15 +3,11 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const sqlite3 = require('sqlite3').verbose();
+const db = require('./database');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const SECRET = process.env.JWT_SECRET || 'default_secret';
-
-// Налаштування бази даних
-const dbPath = process.env.DATABASE_URL || './backend/food_delivery.db';
-const db = new sqlite3.Database(dbPath);
+const PORT = 3000;
+const SECRET = 'your_jwt_secret';
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -22,7 +18,7 @@ app.post('/register', async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
 
   db.run(`INSERT INTO users (username, password) VALUES (?, ?)`, [username, hash], function (err) {
-    if (err) return res.status(400).json({ message: 'Користувач вже існує' });
+    if (err) return res.status(400).json({ message: 'Користувач уже існує' });
     res.json({ message: 'Реєстрація успішна' });
   });
 });
@@ -65,7 +61,6 @@ app.post('/orders', authenticateToken, (req, res) => {
 
   db.run(
     `INSERT INTO orders (user_id, name, address, food, status, time) VALUES (?, ?, ?, ?, ?, ?)`,
-
     [user_id, name, address, food, status, time],
     function (err) {
       if (err) return res.status(500).json({ message: 'Помилка при створенні замовлення' });
